@@ -12,9 +12,11 @@ export default function Layout({ activeTab, onTabChange, children }) {
     <div style={styles.container}>
       <header style={styles.header}>
         <div style={styles.headerLeft}>
-          <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
-            <path d="M8 8L20 4L32 8L36 20L32 32L20 36L8 32L4 20L8 8Z" fill="#1a365d"/>
-            <path d="M14 16L20 12L26 16V24L20 28L14 24V16Z" fill="white"/>
+          <svg width="30" height="28" viewBox="0 0 28 26" fill="none">
+            <path d="M10.1018 20.2366L1.68808 25.226C1.2308 25.4972 0.652473 25.1661 0.65488 24.6344L0.675712 20.0318C0.676801 19.7913 0.804093 19.569 1.01098 19.4463L4.87305 17.1566" fill="#04253A"/>
+            <path d="M17.2695 9.79211L22.2434 6.83109C22.4583 6.70312 22.726 6.70267 22.9414 6.8299L26.8175 9.11959C27.2655 9.38423 27.2659 10.0323 26.8182 10.2974L17.2747 15.949L17.2695 9.79211Z" fill="#04253A"/>
+            <path d="M17.3179 15.951V9.83176L1.79436 0.609427C1.34 0.339495 0.764175 0.664678 0.760702 1.19317L0.731093 5.6996C0.729497 5.94256 0.856867 6.16815 1.06573 6.29228L17.3179 15.951Z" fill="#04253A"/>
+            <path d="M11.0938 19.6444V19.5411V16.5663V13.8763C11.0938 13.6356 10.9673 13.4126 10.7607 13.289L1.77741 7.91783C1.32223 7.64568 0.743868 7.97107 0.742092 8.50141C0.737741 9.80019 0.730736 11.8913 0.725586 13.4287" fill="#04253A"/>
           </svg>
           <span style={styles.logo}>finera</span>
           <span style={styles.logoSub}>Dashboard</span>
@@ -69,7 +71,7 @@ const styles = {
   logo: {
     fontSize: 22,
     fontWeight: 700,
-    color: '#1a365d',
+    color: '#04253A',
     letterSpacing: '-0.5px',
   },
   logoSub: {
@@ -99,7 +101,7 @@ const styles = {
   },
   tabActive: {
     background: '#edf2f7',
-    color: '#1a365d',
+    color: '#04253A',
     fontWeight: 600,
   },
   tabIcon: {
