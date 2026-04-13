@@ -1,10 +1,10 @@
 import { useAuth } from '../pages/_app';
 
 const tabs = [
-  { id: 'economico', label: 'EconÃ³mico', icon: 'ð' },
-  { id: 'comercial', label: 'Comercial', icon: 'ð¤' },
-  { id: 'operaciones', label: 'Operaciones', icon: 'âï¸' },
-  { id: 'producto', label: 'Producto', icon: 'ð' },
+  { id: 'economico', label: 'Económico', icon: '📊' },
+  { id: 'comercial', label: 'Comercial', icon: '🤝' },
+  { id: 'operaciones', label: 'Operaciones', icon: '⚙️' },
+  { id: 'producto', label: 'Producto', icon: '🚀' },
 ];
 
 export default function Layout({ activeTab, onTabChange, children }) {
