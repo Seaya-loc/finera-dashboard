@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 // Sample data - replace with real data source
 const defaultEmployees = [
-  { id: 1, name: 'Javier SÃ¡nchez-Marco', role: 'CEO / Comercial', costMonth: 4500, color: '#3182ce' },
+  { id: 1, name: 'Javier Sánchez-Marco', role: 'CEO / Comercial', costMonth: 4500, color: '#3182ce' },
   { id: 2, name: 'Borja', role: 'Operaciones', costMonth: 3200, color: '#38a169' },
   { id: 3, name: 'Analista 1', role: 'Analista', costMonth: 2800, color: '#d69e2e' },
   { id: 4, name: 'Analista 2', role: 'Analista', costMonth: 2800, color: '#e53e3e' },
@@ -74,9 +74,9 @@ function EmployeeCard({ employee, clients, onReassign, allEmployees, onDelete, o
           {!editing && (
             <div style={{ display: 'flex', gap: 4 }}>
               <button onClick={() => { setEditData({ name: employee.name, role: employee.role, costMonth: employee.costMonth }); setEditing(true); }}
-                style={iconBtnStyle} title="Editar">âï¸</button>
-              <button onClick={() => { if (confirm(`Â¿Eliminar a ${employee.name}? Los clientes asignados quedarÃ¡n sin asignar.`)) onDelete(employee.id); }}
-                style={iconBtnStyle} title="Eliminar">ðï¸</button>
+                style={iconBtnStyle} title="Editar">✏️</button>
+              <button onClick={() => { if (confirm(`¿Eliminar a ${employee.name}? Los clientes asignados quedarán sin asignar.`)) onDelete(employee.id); }}
+                style={iconBtnStyle} title="Eliminar">🗑️</button>
             </div>
           )}
         </div>
@@ -84,7 +84,7 @@ function EmployeeCard({ employee, clients, onReassign, allEmployees, onDelete, o
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 12, marginBottom: 16 }}>
         <div>
-          <div style={miniLabel}>FacturaciÃ³n /mes</div>
+          <div style={miniLabel}>Facturación /mes</div>
           <div style={miniValue}>{fmt(totalMRR)}</div>
         </div>
         <div>
@@ -92,11 +92,11 @@ function EmployeeCard({ employee, clients, onReassign, allEmployees, onDelete, o
           <div style={miniValue}>{fmt(employee.costMonth)}</div>
         </div>
         <div>
-          <div style={miniLabel}>Margen /aÃ±o</div>
+          <div style={miniLabel}>Margen /año</div>
           <div style={{ ...miniValue, color: margin >= 0 ? '#38a169' : '#e53e3e' }}>{fmt(margin)}</div>
         </div>
         <div>
-          <div style={miniLabel}>NÂº Clientes</div>
+          <div style={miniLabel}>Nº Clientes</div>
           <div style={miniValue}>{clients.length}</div>
         </div>
       </div>
@@ -199,7 +199,7 @@ export default function Operaciones() {
           <span style={{ fontSize: 24, fontWeight: 700, color: '#1a365d' }}>{fmt(totalCost)}</span>
         </div>
         <div style={summaryCard}>
-          <span style={miniLabel}>Ratio FacturaciÃ³n/Coste</span>
+          <span style={miniLabel}>Ratio Facturación/Coste</span>
           <span style={{
             fontSize: 24, fontWeight: 700,
             color: parseFloat(overallRatio) >= 3 ? '#38a169' : parseFloat(overallRatio) >= 2 ? '#d69e2e' : '#e53e3e',
@@ -211,13 +211,13 @@ export default function Operaciones() {
         </div>
         <div style={{ ...summaryCard, cursor: 'pointer', background: showAddClient ? '#edf2f7' : '#fff' }}
           onClick={() => { setShowAddClient(!showAddClient); setShowAddEmployee(false); }}>
-          <span style={miniLabel}>AcciÃ³n</span>
-          <span style={{ fontSize: 14, fontWeight: 600, color: '#3182ce' }}>+ AÃ±adir cliente</span>
+          <span style={miniLabel}>Acción</span>
+          <span style={{ fontSize: 14, fontWeight: 600, color: '#3182ce' }}>+ Añadir cliente</span>
         </div>
         <div style={{ ...summaryCard, cursor: 'pointer', background: showAddEmployee ? '#edf2f7' : '#fff' }}
           onClick={() => { setShowAddEmployee(!showAddEmployee); setShowAddClient(false); }}>
-          <span style={miniLabel}>AcciÃ³n</span>
-          <span style={{ fontSize: 14, fontWeight: 600, color: '#38a169' }}>+ AÃ±adir empleado</span>
+          <span style={miniLabel}>Acción</span>
+          <span style={{ fontSize: 14, fontWeight: 600, color: '#38a169' }}>+ Añadir empleado</span>
         </div>
       </div>
 
@@ -229,7 +229,7 @@ export default function Operaciones() {
             <input value={newClient.name} onChange={e => setNewClient({ ...newClient, name: e.target.value })} placeholder="EMPRESA S.L." style={inputStyle} />
           </div>
           <div style={{ flex: '1 1 100px' }}>
-            <label style={miniLabel}>MRR (â¬)</label>
+            <label style={miniLabel}>MRR (€)</label>
             <input type="number" value={newClient.mrr} onChange={e => setNewClient({ ...newClient, mrr: e.target.value })} placeholder="1500" style={inputStyle} />
           </div>
           <div style={{ flex: '1 1 120px' }}>
@@ -239,7 +239,7 @@ export default function Operaciones() {
               {employees.map(emp => (<option key={emp.id} value={emp.id}>{emp.name}</option>))}
             </select>
           </div>
-          <button onClick={handleAddClient} style={btnStyle}>AÃ±adir</button>
+          <button onClick={handleAddClient} style={btnStyle}>Añadir</button>
         </div>
       )}
 
@@ -255,10 +255,10 @@ export default function Operaciones() {
             <input value={newEmployee.role} onChange={e => setNewEmployee({ ...newEmployee, role: e.target.value })} placeholder="Ej: Analista" style={inputStyle} />
           </div>
           <div style={{ flex: '1 1 100px' }}>
-            <label style={miniLabel}>Coste empresa /mes (â¬)</label>
+            <label style={miniLabel}>Coste empresa /mes (€)</label>
             <input type="number" value={newEmployee.costMonth} onChange={e => setNewEmployee({ ...newEmployee, costMonth: e.target.value })} placeholder="2800" style={inputStyle} />
           </div>
-          <button onClick={handleAddEmployee} style={{ ...btnStyle, background: '#38a169' }}>AÃ±adir empleado</button>
+          <button onClick={handleAddEmployee} style={{ ...btnStyle, background: '#38a169' }}>Añadir empleado</button>
         </div>
       )}
 
@@ -276,7 +276,7 @@ export default function Operaciones() {
       </div>
 
       <p style={{ fontSize: 11, color: '#a0aec0', marginTop: 20 }}>
-        * Los datos de empleados y asignaciones son editables. Los cambios se guardan en la sesiÃ³n actual.
+        * Los datos de empleados y asignaciones son editables. Los cambios se guardan en la sesión actual.
       </p>
     </div>
   );
