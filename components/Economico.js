@@ -1,27 +1,27 @@
 import { useState, useEffect } from 'react';
 
-// âââ Constants âââ
+// ─── Constants ───
 const MONTH_NAMES_FULL = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 const MONTH_NAMES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 
-// Platform account names that are TRUE platforms (rest â G&A)
+// Platform account names that are TRUE platforms (rest → G&A)
 const TRUE_PLATFORM_KEYWORDS = ['biloop', 'autodespo', 'aelis', 'next step'];
 function isTruePlatform(name) {
   const n = (name || '').toLowerCase();
   return TRUE_PLATFORM_KEYWORDS.some(kw => n.includes(kw));
 }
 
-// âââ Formatting âââ
+// ─── Formatting ───
 function fmt(n) {
-  if (n === null || n === undefined || isNaN(n)) return 'â';
+  if (n === null || n === undefined || isNaN(n)) return '—';
   return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(n);
 }
 function fmtPct(n) {
-  if (n === null || n === undefined || isNaN(n)) return 'â';
+  if (n === null || n === undefined || isNaN(n)) return '—';
   return `${n.toFixed(1)}%`;
 }
 
-// âââ Detect client MoM status for coloring âââ
+// ─── Detect client MoM status for coloring ───
 function getClientStatus(monthly, monthIdx) {
   const cur = monthly[monthIdx] || 0;
   const prev = monthIdx > 0 ? (monthly[monthIdx - 1] || 0) : null;
@@ -41,7 +41,7 @@ const statusLabels = {
   new: 'New', upsell: 'Upsell', churn: 'Churn', downsell: 'Downsell', existing: '', none: '',
 };
 
-// âââ KPI Card âââ
+// ─── KPI Card ───
 function KPICard({ label, value, subtitle, trend, color = '#1a365d' }) {
   return (
     <div style={kpiStyles.card}>
@@ -50,7 +50,7 @@ function KPICard({ label, value, subtitle, trend, color = '#1a365d' }) {
       {subtitle && <div style={kpiStyles.subtitle}>{subtitle}</div>}
       {trend !== undefined && trend !== null && (
         <div style={{ ...kpiStyles.trend, color: trend >= 0 ? '#38a169' : '#e53e3e' }}>
-          {trend >= 0 ? 'â²' : 'â¼'} {Math.abs(trend).toFixed(1)}%
+          {trend >= 0 ? '▲' : '▼'} {Math.abs(trend).toFixed(1)}%
         </div>
       )}
     </div>
@@ -64,7 +64,7 @@ const kpiStyles = {
   trend: { fontSize: 13, fontWeight: 600, marginTop: 6 },
 };
 
-// âââ Simple Bar Chart âââ
+// ─── Simple Bar Chart ───
 function SimpleBarChart({ data, barColor = '#3182ce' }) {
   const max = Math.max(...data.map(d => Math.abs(d.value)), 1);
   return (
@@ -88,7 +88,7 @@ function SimpleBarChart({ data, barColor = '#3182ce' }) {
   );
 }
 
-// âââ Main Component âââ
+// ─── Main Component ───
 export default function Economico() {
   const [bpData, setBpData] = useState(null);
   const [holdedPL, setHoldedPL] = useState(null);
@@ -144,7 +144,7 @@ export default function Economico() {
   const REAL_MONTHS = pl ? pl.realMonths : 0;
   const displayMonths = selectedMonth || REAL_MONTHS || 0;
 
-  // ââ Merge data: Holded real + BP forecast ââ
+  // ── Merge data: Holded real + BP forecast ──
   const revenues = Array.from({ length: 12 }, (_, m) => {
     if (m < REAL_MONTHS && pl && pl.months && pl.months[m]) return pl.months[m].revenue;
     return bp.revenues ? bp.revenues[m] : 0;
@@ -154,7 +154,7 @@ export default function Economico() {
     return bp.staff_cost ? Math.abs(bp.staff_cost[m]) : 0;
   });
 
-  // ââ Account breakdowns from Holded ââ
+  // ── Account breakdowns from Holded ──
   const revenueAccountsByMonth = Array.from({ length: 12 }, (_, m) => {
     if (m < REAL_MONTHS && pl && pl.months && pl.months[m]) return pl.months[m].revenue_accounts || [];
     return [];
@@ -168,17 +168,17 @@ export default function Economico() {
     return [];
   });
 
-  // ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-  // NEW STRUCTURE: Split revenue, platforms, amortizaciÃ³n
-  // ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+  // ══════════════════════════════════════════════════════════
+  // NEW STRUCTURE: Split revenue, platforms, amortización
+  // ══════════════════════════════════════════════════════════
 
-  // ââ MRR (recurring) from account 705000000 ââ
+  // ── MRR (recurring) from account 705000000 ──
   const mrrByMonth = revenueAccountsByMonth.map(accs => {
     const recurring = accs.filter(a => String(a.num).startsWith('70500000'));
     return recurring.reduce((s, a) => s + a.amount, 0);
   });
 
-  // ââ Non-recurring revenue (compute directly from account data for real months) ââ
+  // ── Non-recurring revenue (compute directly from account data for real months) ──
   const nonRecurringByMonth = Array.from({ length: 12 }, (_, m) => {
     if (m < REAL_MONTHS) {
       return revenueAccountsByMonth[m]
@@ -188,13 +188,13 @@ export default function Economico() {
     return revenues[m] - mrrByMonth[m];
   });
 
-  // ââ Recalculate revenues for real months to ensure they match exactly ââ
+  // ── Recalculate revenues for real months to ensure they match exactly ──
   const revenuesCorrected = Array.from({ length: 12 }, (_, m) => {
     if (m < REAL_MONTHS) return mrrByMonth[m] + nonRecurringByMonth[m];
     return revenues[m];
   });
 
-  // ââ Non-recurring revenue account detail ââ
+  // ── Non-recurring revenue account detail ──
   const allNonRecurringAccounts = {};
   revenueAccountsByMonth.forEach(accs => {
     accs.filter(a => !String(a.num).startsWith('70500000')).forEach(a => {
@@ -202,7 +202,7 @@ export default function Economico() {
     });
   });
 
-  // ââ TRUE Platforms (Biloop, Autodespo, AELIS, Next Step) ââ
+  // ── TRUE Platforms (Biloop, Autodespo, AELIS, Next Step) ──
   const truePlatformsByMonth = platformAccountsByMonth.map(accs => {
     return accs.filter(a => isTruePlatform(a.name)).reduce((s, a) => s + a.amount, 0);
   });
@@ -212,17 +212,17 @@ export default function Economico() {
     return bp.platforms ? Math.abs(bp.platforms[m]) : 0;
   });
 
-  // ââ Non-true platforms â go to G&A ââ
+  // ── Non-true platforms → go to G&A ──
   const fakePlatformsByMonth = platformAccountsByMonth.map(accs => {
     return accs.filter(a => !isTruePlatform(a.name)).reduce((s, a) => s + a.amount, 0);
   });
 
-  // ââ AmortizaciÃ³n (68x accounts, currently inside ga_accounts) ââ
+  // ── Amortización (68x accounts, currently inside ga_accounts) ──
   const amortizationByMonth = gaAccountsByMonth.map(accs => {
     return accs.filter(a => String(a.num).startsWith('68')).reduce((s, a) => s + a.amount, 0);
   });
 
-  // ââ G&A = original G&A + fake platforms - amortizaciÃ³n ââ
+  // ── G&A = original G&A + fake platforms - amortización ──
   const gaCosts = Array.from({ length: 12 }, (_, m) => {
     if (m < REAL_MONTHS && pl && pl.months && pl.months[m]) {
       const originalGA = pl.months[m].ga;
@@ -231,7 +231,7 @@ export default function Economico() {
     return bp.ga_costs ? Math.abs(bp.ga_costs[m]) : 0;
   });
 
-  // ââ Collect unique accounts for detail views ââ
+  // ── Collect unique accounts for detail views ──
   const allTruePlatformAccounts = {};
   platformAccountsByMonth.forEach(accs => {
     accs.filter(a => isTruePlatform(a.name)).forEach(a => {
@@ -246,7 +246,7 @@ export default function Economico() {
       if (!allGAAccounts[a.num]) allGAAccounts[a.num] = a.name;
     });
   });
-  // Add original G&A accounts (excluding amortizaciÃ³n)
+  // Add original G&A accounts (excluding amortización)
   gaAccountsByMonth.forEach(accs => {
     accs.filter(a => !String(a.num).startsWith('68')).forEach(a => {
       if (!allGAAccounts[a.num]) allGAAccounts[a.num] = a.name;
@@ -271,7 +271,7 @@ export default function Economico() {
     return 0;
   }
 
-  // ââ Derived metrics ââ
+  // ── Derived metrics ──
   const contribution = revenuesCorrected.map((r, m) => r - staffCost[m] - platformsCostTotal[m]);
   const contributionMargin = revenuesCorrected.map((r, m) => r > 0 ? (contribution[m] / r) * 100 : 0);
   const ebitda = contribution.map((c, m) => c - gaCosts[m]);
@@ -279,7 +279,7 @@ export default function Economico() {
   const netResult = ebitda.map((e, m) => e - amortTotal[m]);
   const cashAccumulated = bp.cash_accumulated || Array(12).fill(0);
 
-  // ââ KPI totals (from displayMonths only) ââ
+  // ── KPI totals (from displayMonths only) ──
   const totalRevenue = revenuesCorrected.slice(0, displayMonths).reduce((a, b) => a + b, 0);
   const totalExpenses = staffCost.slice(0, displayMonths).map((s, m) => s + platformsCostTotal[m] + gaCosts[m]);
   const totalExp = totalExpenses.reduce((a, b) => a + b, 0);
@@ -292,10 +292,10 @@ export default function Economico() {
   const revGrowth = prevMonth !== null && revenuesCorrected[prevMonth] > 0
     ? ((revenuesCorrected[lastRealMonth] - revenuesCorrected[prevMonth]) / revenuesCorrected[prevMonth]) * 100 : null;
 
-  // ââ Client data from BP ââ
+  // ── Client data from BP ──
   const clients = bp.clients || [];
 
-  // ââ ARR = 12 * monthly recurring ââ
+  // ── ARR = 12 * monthly recurring ──
   const arrByMonth = mrrByMonth.map(m => m * 12);
 
   return (
@@ -329,9 +329,9 @@ export default function Economico() {
       {/* Sub-navigation */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 24, flexWrap: 'wrap' }}>
         {[
-          { key: 'metricas', label: 'MÃ©tricas principales' },
-          { key: 'pl', label: 'P&L y PrevisiÃ³n de Caja' },
-          { key: 'cierre', label: 'Cierre de AÃ±o' },
+          { key: 'metricas', label: 'Métricas principales' },
+          { key: 'pl', label: 'P&L y Previsión de Caja' },
+          { key: 'cierre', label: 'Cierre de Año' },
         ].map(t => (
           <button key={t.key} onClick={() => setSubTab(t.key)} style={{
             ...subTabStyle, ...(subTab === t.key ? subTabActive : {}),
@@ -352,17 +352,17 @@ export default function Economico() {
         </div>
       )}
 
-      {/* âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ */}
-      {/* TAB 1: MÃ©tricas principales */}
-      {/* âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ */}
+      {/* ═══════════════════════════════════════════════════════════ */}
+      {/* TAB 1: Métricas principales */}
+      {/* ═══════════════════════════════════════════════════════════ */}
       {subTab === 'metricas' && (
         <>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 24 }}>
-            <KPICard label="Ingresos" value={fmt(totalRevenue)} subtitle={`Acumulado hasta ${MONTH_NAMES_FULL[displayMonths - 1] || 'â'}`} trend={revGrowth} />
-            <KPICard label="Gastos" value={fmt(-totalExp)} subtitle={`Acumulado hasta ${MONTH_NAMES_FULL[displayMonths - 1] || 'â'}`} />
-            <KPICard label="EBITDA" value={fmt(totalEBITDA)} subtitle={`Acumulado hasta ${MONTH_NAMES_FULL[displayMonths - 1] || 'â'}`} color={totalEBITDA >= 0 ? '#38a169' : '#e53e3e'} />
-            <KPICard label="MRR actual" value={fmt(currentMRR)} subtitle={`${MONTH_NAMES[displayMonths - 1] || 'â'} 2026`} color="#3182ce" />
-            <KPICard label="Caja" value={fmt(lastCash)} subtitle={`${MONTH_NAMES[displayMonths - 1] || 'â'} 2026`} />
+            <KPICard label="Ingresos" value={fmt(totalRevenue)} subtitle={`Acumulado hasta ${MONTH_NAMES_FULL[displayMonths - 1] || '—'}`} trend={revGrowth} />
+            <KPICard label="Gastos" value={fmt(-totalExp)} subtitle={`Acumulado hasta ${MONTH_NAMES_FULL[displayMonths - 1] || '—'}`} />
+            <KPICard label="EBITDA" value={fmt(totalEBITDA)} subtitle={`Acumulado hasta ${MONTH_NAMES_FULL[displayMonths - 1] || '—'}`} color={totalEBITDA >= 0 ? '#38a169' : '#e53e3e'} />
+            <KPICard label="MRR actual" value={fmt(currentMRR)} subtitle={`${MONTH_NAMES[displayMonths - 1] || '—'} 2026`} color="#3182ce" />
+            <KPICard label="Caja" value={fmt(lastCash)} subtitle={`${MONTH_NAMES[displayMonths - 1] || '—'} 2026`} />
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 24 }}>
@@ -404,13 +404,13 @@ export default function Economico() {
         </>
       )}
 
-      {/* âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ */}
-      {/* TAB 2: P&L y PrevisiÃ³n de Caja */}
-      {/* âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ */}
+      {/* ═══════════════════════════════════════════════════════════ */}
+      {/* TAB 2: P&L y Previsión de Caja */}
+      {/* ═══════════════════════════════════════════════════════════ */}
       {subTab === 'pl' && (
         <>
         <div style={{ ...cardStyle, overflowX: 'auto' }}>
-          <h3 style={{ ...cardTitle, marginBottom: 20 }}>Cuenta de Resultados â 2026</h3>
+          <h3 style={{ ...cardTitle, marginBottom: 20 }}>Cuenta de Resultados — 2026</h3>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
             <thead>
               <tr>
@@ -423,10 +423,10 @@ export default function Economico() {
             </thead>
             <tbody>
 
-              {/* ââ INGRESOS RECURRENTES ââ */}
+              {/* ── INGRESOS RECURRENTES ── */}
               <tr style={{ cursor: 'pointer' }} onClick={() => setShowRecurringDetail(!showRecurringDetail)}>
                 <td style={{ ...tdStyle, fontWeight: 700, color: '#1a365d', position: 'sticky', left: 0, background: '#ebf8ff', zIndex: 1 }}>
-                  <span style={{ marginRight: 6 }}>{showRecurringDetail ? 'â¾' : 'â¸'}</span>
+                  <span style={{ marginRight: 6 }}>{showRecurringDetail ? '▾' : '▸'}</span>
                   INGRESOS RECURRENTES
                 </td>
                 {mrrByMonth.slice(0, displayMonths).map((v, i) => (
@@ -461,10 +461,10 @@ export default function Economico() {
                 );
               })}
 
-              {/* ââ INGRESOS NO RECURRENTES ââ */}
+              {/* ── INGRESOS NO RECURRENTES ── */}
               <tr style={{ cursor: 'pointer' }} onClick={() => setShowNonRecurringDetail(!showNonRecurringDetail)}>
                 <td style={{ ...tdStyle, fontWeight: 700, color: '#975a16', position: 'sticky', left: 0, background: '#fefcbf', zIndex: 1 }}>
-                  <span style={{ marginRight: 6 }}>{showNonRecurringDetail ? 'â¾' : 'â¸'}</span>
+                  <span style={{ marginRight: 6 }}>{showNonRecurringDetail ? '▾' : '▸'}</span>
                   INGRESOS NO RECURRENTES
                 </td>
                 {nonRecurringByMonth.slice(0, displayMonths).map((v, i) => (
@@ -483,7 +483,7 @@ export default function Economico() {
                   </td>
                   {Array.from({ length: displayMonths }, (_, m) => {
                     const acc = (revenueAccountsByMonth[m] || []).find(a => String(a.num) === String(num));
-                    return <td key={m} style={{ ...tdStyle, textAlign: 'right', fontSize: 11, color: '#718096' }}>{acc ? fmt(acc.amount) : 'â'}</td>;
+                    return <td key={m} style={{ ...tdStyle, textAlign: 'right', fontSize: 11, color: '#718096' }}>{acc ? fmt(acc.amount) : '—'}</td>;
                   })}
                   <td style={{ ...tdStyle, textAlign: 'right', fontSize: 11, fontWeight: 600, color: '#718096', borderLeft: '2px solid #e2e8f0' }}>
                     {fmt(revenueAccountsByMonth.slice(0, displayMonths).reduce((sum, accs) => {
@@ -494,7 +494,7 @@ export default function Economico() {
                 </tr>
               ))}
 
-              {/* ââ TOTAL INGRESOS ââ */}
+              {/* ── TOTAL INGRESOS ── */}
               <tr style={{ background: '#e6fffa' }}>
                 <td style={{ ...tdStyle, fontWeight: 700, color: '#276749', position: 'sticky', left: 0, background: '#e6fffa', zIndex: 1 }}>TOTAL INGRESOS</td>
                 {revenuesCorrected.slice(0, displayMonths).map((v, i) => (
@@ -505,13 +505,13 @@ export default function Economico() {
 
               <tr><td colSpan={displayMonths + 2} style={{ height: 6 }} /></tr>
 
-              {/* ââ COSTE DE PERSONAL ââ */}
+              {/* ── COSTE DE PERSONAL ── */}
               {makeRowWithTotal('Coste de personal', staffCost, displayMonths)}
 
-              {/* ââ PLATAFORMAS (true platforms only) ââ */}
+              {/* ── PLATAFORMAS (true platforms only) ── */}
               <tr style={{ cursor: 'pointer' }} onClick={() => setShowPlatformDetail(!showPlatformDetail)}>
                 <td style={{ ...tdStyle, fontWeight: 600, color: '#2d3748', position: 'sticky', left: 0, background: '#fff', zIndex: 1 }}>
-                  <span style={{ marginRight: 6 }}>{showPlatformDetail ? 'â¾' : 'â¸'}</span>
+                  <span style={{ marginRight: 6 }}>{showPlatformDetail ? '▾' : '▸'}</span>
                   Plataformas
                 </td>
                 {platformsCostTotal.slice(0, displayMonths).map((v, i) => (
@@ -528,7 +528,7 @@ export default function Economico() {
                   </td>
                   {Array.from({ length: displayMonths }, (_, m) => {
                     const acc = (platformAccountsByMonth[m] || []).find(a => String(a.num) === String(num));
-                    return <td key={m} style={{ ...tdStyle, textAlign: 'right', fontSize: 11, color: '#718096' }}>{acc ? fmt(acc.amount) : 'â'}</td>;
+                    return <td key={m} style={{ ...tdStyle, textAlign: 'right', fontSize: 11, color: '#718096' }}>{acc ? fmt(acc.amount) : '—'}</td>;
                   })}
                   <td style={{ ...tdStyle, textAlign: 'right', fontSize: 11, color: '#718096', borderLeft: '2px solid #e2e8f0' }}>
                     {fmt(platformAccountsByMonth.slice(0, displayMonths).reduce((s, accs) => { const a = accs.find(a => String(a.num) === String(num)); return s + (a ? a.amount : 0); }, 0))}
@@ -536,16 +536,16 @@ export default function Economico() {
                 </tr>
               ))}
 
-              {/* ââ CONTRIBUCIÃN ââ */}
-              {makeRowWithTotal('CONTRIBUCIÃN', contribution, displayMonths, { bold: true, bg: '#f0fff4' })}
-              {makePctRowWithTotal('% Margen de contribuciÃ³n', contributionMargin, displayMonths)}
+              {/* ── CONTRIBUCIÓN ── */}
+              {makeRowWithTotal('CONTRIBUCIÓN', contribution, displayMonths, { bold: true, bg: '#f0fff4' })}
+              {makePctRowWithTotal('% Margen de contribución', contributionMargin, displayMonths)}
 
               <tr><td colSpan={displayMonths + 2} style={{ height: 6 }} /></tr>
 
-              {/* ââ G&A (includes non-true platforms + original G&A - amortizaciÃ³n) ââ */}
+              {/* ── G&A (includes non-true platforms + original G&A - amortización) ── */}
               <tr style={{ cursor: 'pointer' }} onClick={() => setShowGADetail(!showGADetail)}>
                 <td style={{ ...tdStyle, fontWeight: 600, color: '#2d3748', position: 'sticky', left: 0, background: '#fff', zIndex: 1 }}>
-                  <span style={{ marginRight: 6 }}>{showGADetail ? 'â¾' : 'â¸'}</span>
+                  <span style={{ marginRight: 6 }}>{showGADetail ? '▾' : '▸'}</span>
                   Gastos generales (G&A)
                 </td>
                 {gaCosts.slice(0, displayMonths).map((v, i) => (
@@ -562,7 +562,7 @@ export default function Economico() {
                   </td>
                   {Array.from({ length: displayMonths }, (_, m) => {
                     const amount = getAccountAmount(num, m);
-                    return <td key={m} style={{ ...tdStyle, textAlign: 'right', fontSize: 11, color: '#718096' }}>{amount ? fmt(-amount) : 'â'}</td>;
+                    return <td key={m} style={{ ...tdStyle, textAlign: 'right', fontSize: 11, color: '#718096' }}>{amount ? fmt(-amount) : '—'}</td>;
                   })}
                   <td style={{ ...tdStyle, textAlign: 'right', fontSize: 11, color: '#718096', borderLeft: '2px solid #e2e8f0' }}>
                     {fmt(-Array.from({ length: displayMonths }).reduce((s, _, m) => s + getAccountAmount(num, m), 0))}
@@ -570,30 +570,30 @@ export default function Economico() {
                 </tr>
               ))}
 
-              {/* ââ EBITDA ââ */}
+              {/* ── EBITDA ── */}
               {makeRowWithTotal('EBITDA', ebitda, displayMonths, { bold: true, bg: '#fefcbf' })}
 
               <tr><td colSpan={displayMonths + 2} style={{ height: 4 }} /></tr>
 
-              {/* ââ AMORTIZACIÃN (below EBITDA) ââ */}
+              {/* ── AMORTIZACIÓN (below EBITDA) ── */}
               <tr>
                 <td style={{ ...tdStyle, fontWeight: 600, color: '#6b46c1', position: 'sticky', left: 0, background: '#faf5ff', zIndex: 1 }}>
-                  AmortizaciÃ³n
+                  Amortización
                 </td>
                 {amortTotal.slice(0, displayMonths).map((v, i) => (
-                  <td key={i} style={{ ...tdStyle, textAlign: 'right', fontWeight: 600, color: '#6b46c1', background: '#faf5ff' }}>{v > 0 ? fmt(-v) : 'â'}</td>
+                  <td key={i} style={{ ...tdStyle, textAlign: 'right', fontWeight: 600, color: '#6b46c1', background: '#faf5ff' }}>{v > 0 ? fmt(-v) : '—'}</td>
                 ))}
                 <td style={{ ...tdStyle, textAlign: 'right', fontWeight: 700, color: '#6b46c1', background: '#faf5ff', borderLeft: '2px solid #e2e8f0' }}>
                   {fmt(-amortTotal.slice(0, displayMonths).reduce((a, b) => a + b, 0))}
                 </td>
               </tr>
 
-              {/* ââ RESULTADO NETO ââ */}
+              {/* ── RESULTADO NETO ── */}
               {makeRowWithTotal('RESULTADO NETO', netResult, displayMonths, { bold: true, bg: '#fed7e2' })}
 
               <tr><td colSpan={displayMonths + 2} style={{ height: 6 }} /></tr>
 
-              {/* ââ CAJA ACUMULADA ââ */}
+              {/* ── CAJA ACUMULADA ── */}
               <tr style={{ background: '#c6f6d5' }}>
                 <td style={{ ...tdStyle, fontWeight: 700, color: '#276749', position: 'sticky', left: 0, background: '#c6f6d5', zIndex: 1 }}>CAJA ACUMULADA</td>
                 {cashAccumulated.slice(0, displayMonths).map((v, i) => (
@@ -609,11 +609,11 @@ export default function Economico() {
           </p>
         </div>
 
-        {/* âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ */}
+        {/* ═══════════════════════════════════════════════════════════ */}
         {/* ARR TABLE (12 x Monthly Recurring Revenue) */}
-        {/* âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ */}
+        {/* ═══════════════════════════════════════════════════════════ */}
         <div style={{ ...cardStyle, overflowX: 'auto', marginTop: 24 }}>
-          <h3 style={{ ...cardTitle, marginBottom: 20 }}>ARR (Annual Recurring Revenue) â 2026</h3>
+          <h3 style={{ ...cardTitle, marginBottom: 20 }}>ARR (Annual Recurring Revenue) — 2026</h3>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
             <thead>
               <tr>
@@ -627,35 +627,35 @@ export default function Economico() {
               <tr>
                 <td style={{ ...tdStyle, color: '#319795', position: 'sticky', left: 0, background: '#fff', zIndex: 1 }}>MRR (mensual)</td>
                 {mrrByMonth.slice(0, displayMonths).map((v, i) => (
-                  <td key={i} style={{ ...tdStyle, textAlign: 'right', color: '#319795' }}>{v > 0 ? fmt(v) : 'â'}</td>
+                  <td key={i} style={{ ...tdStyle, textAlign: 'right', color: '#319795' }}>{v > 0 ? fmt(v) : '—'}</td>
                 ))}
               </tr>
               <tr style={{ background: '#e6fffa' }}>
-                <td style={{ ...tdStyle, fontWeight: 700, color: '#276749', position: 'sticky', left: 0, background: '#e6fffa', zIndex: 1 }}>ARR (12 Ã MRR)</td>
+                <td style={{ ...tdStyle, fontWeight: 700, color: '#276749', position: 'sticky', left: 0, background: '#e6fffa', zIndex: 1 }}>ARR (12 × MRR)</td>
                 {arrByMonth.slice(0, displayMonths).map((v, i) => (
-                  <td key={i} style={{ ...tdStyle, textAlign: 'right', fontWeight: 700, color: '#276749', background: '#e6fffa' }}>{v > 0 ? fmt(v) : 'â'}</td>
+                  <td key={i} style={{ ...tdStyle, textAlign: 'right', fontWeight: 700, color: '#276749', background: '#e6fffa' }}>{v > 0 ? fmt(v) : '—'}</td>
                 ))}
               </tr>
             </tbody>
           </table>
           <p style={{ fontSize: 11, color: '#a0aec0', marginTop: 12 }}>
-            ARR = 12 Ã Ingresos Recurrentes mensuales (cuenta 705000000). Solo meses con datos reales de Holded.
+            ARR = 12 × Ingresos Recurrentes mensuales (cuenta 705000000). Solo meses con datos reales de Holded.
           </p>
         </div>
         </>
       )}
 
-      {/* âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ */}
-      {/* TAB 3: Cierre de AÃ±o */}
-      {/* âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ */}
+      {/* ═══════════════════════════════════════════════════════════ */}
+      {/* TAB 3: Cierre de Año */}
+      {/* ═══════════════════════════════════════════════════════════ */}
       {subTab === 'cierre' && (
         <div style={{ ...cardStyle, overflowX: 'auto' }}>
-          <h3 style={{ ...cardTitle, marginBottom: 8 }}>Cierre de AÃ±o â Real vs. PrevisiÃ³n</h3>
+          <h3 style={{ ...cardTitle, marginBottom: 8 }}>Cierre de Año — Real vs. Previsión</h3>
           <p style={{ fontSize: 12, color: '#718096', marginBottom: 20 }}>
             <span style={{ display: 'inline-block', width: 12, height: 12, background: '#c6f6d5', borderRadius: 2, marginRight: 4, verticalAlign: 'middle' }} />
             Real (R) = datos cerrados de Holded &nbsp;
             <span style={{ display: 'inline-block', width: 12, height: 12, background: '#fefcbf', borderRadius: 2, marginRight: 4, verticalAlign: 'middle' }} />
-            PrevisiÃ³n (P) = Business Plan
+            Previsión (P) = Business Plan
           </p>
 
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
@@ -677,13 +677,13 @@ export default function Economico() {
               <tr><td colSpan={displayMonths + 2} style={{ height: 4 }} /></tr>
               {makeCierreRow('Coste de personal', staffCost, displayMonths, REAL_MONTHS)}
               {makeCierreRow('Plataformas', platformsCostTotal, displayMonths, REAL_MONTHS)}
-              {makeCierreRow('CONTRIBUCIÃN', contribution, displayMonths, REAL_MONTHS, { bold: true, bg: '#f0fff4' })}
-              {makeCierrePctRow('% Margen contribuciÃ³n', contributionMargin, displayMonths, REAL_MONTHS)}
+              {makeCierreRow('CONTRIBUCIÓN', contribution, displayMonths, REAL_MONTHS, { bold: true, bg: '#f0fff4' })}
+              {makeCierrePctRow('% Margen contribución', contributionMargin, displayMonths, REAL_MONTHS)}
               <tr><td colSpan={displayMonths + 2} style={{ height: 4 }} /></tr>
               {makeCierreRow('Gastos generales (G&A)', gaCosts, displayMonths, REAL_MONTHS)}
               {makeCierreRow('EBITDA', ebitda, displayMonths, REAL_MONTHS, { bold: true, bg: '#fefcbf' })}
               <tr><td colSpan={displayMonths + 2} style={{ height: 4 }} /></tr>
-              {makeCierreRow('AmortizaciÃ³n', amortTotal, displayMonths, REAL_MONTHS, { color: '#6b46c1', bg: '#faf5ff' })}
+              {makeCierreRow('Amortización', amortTotal, displayMonths, REAL_MONTHS, { color: '#6b46c1', bg: '#faf5ff' })}
               {makeCierreRow('RESULTADO NETO', netResult, displayMonths, REAL_MONTHS, { bold: true, bg: '#fed7e2' })}
               <tr><td colSpan={displayMonths + 2} style={{ height: 4 }} /></tr>
               {makeCierreRow('CAJA ACUMULADA', cashAccumulated, displayMonths, REAL_MONTHS, { bold: true, bg: '#c6f6d5', color: '#276749' })}
@@ -701,7 +701,7 @@ export default function Economico() {
               </div>
             </div>
             <div style={{ flex: '1 1 200px', background: '#fffff0', borderRadius: 8, padding: 16 }}>
-              <div style={{ fontSize: 11, color: '#975a16', fontWeight: 600 }}>PrevisiÃ³n ({Math.max(0, 12 - displayMonths)} meses)</div>
+              <div style={{ fontSize: 11, color: '#975a16', fontWeight: 600 }}>Previsión ({Math.max(0, 12 - displayMonths)} meses)</div>
               <div style={{ fontSize: 20, fontWeight: 700, color: '#744210', marginTop: 4 }}>
                 {fmt(revenuesCorrected.slice(displayMonths).reduce((a, b) => a + b, 0))} ingresos
               </div>
@@ -710,7 +710,7 @@ export default function Economico() {
               </div>
             </div>
             <div style={{ flex: '1 1 200px', background: '#ebf8ff', borderRadius: 8, padding: 16 }}>
-              <div style={{ fontSize: 11, color: '#3182ce', fontWeight: 600 }}>Total AÃ±o 2026</div>
+              <div style={{ fontSize: 11, color: '#3182ce', fontWeight: 600 }}>Total Año 2026</div>
               <div style={{ fontSize: 20, fontWeight: 700, color: '#1a365d', marginTop: 4 }}>
                 {fmt(totalRevenue)} ingresos
               </div>
@@ -725,7 +725,7 @@ export default function Economico() {
   );
 }
 
-// âââ Row helpers âââ
+// ─── Row helpers ───
 function makeRowWithTotal(label, values, displayMonths, opts = {}) {
   const { bold, bg, color: textColor } = opts;
   const sliced = values.slice(0, displayMonths);
@@ -791,7 +791,7 @@ function makeCierrePctRow(label, values, displayMonths, REAL_MONTHS) {
   );
 }
 
-// âââ Styles âââ
+// ─── Styles ───
 const tdStyle = { padding: '8px 12px', borderBottom: '1px solid #edf2f7', fontSize: 13, whiteSpace: 'nowrap' };
 const thStyle = { padding: '10px 12px', borderBottom: '2px solid #e2e8f0', color: '#718096', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', textAlign: 'right', whiteSpace: 'nowrap', position: 'sticky', top: 0, background: '#fff', zIndex: 2 };
 const subTabStyle = { padding: '8px 16px', border: '1px solid #e2e8f0', background: '#fff', borderRadius: 8, fontSize: 13, fontWeight: 500, cursor: 'pointer', color: '#718096', fontFamily: 'inherit', transition: 'all 0.2s' };
