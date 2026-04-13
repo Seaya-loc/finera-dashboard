@@ -22,7 +22,7 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || 'Error al iniciar sesiÃ³n');
+        setError(data.error || 'Error al iniciar sesión');
         setLoading(false);
         return;
       }
@@ -30,7 +30,7 @@ export default function LoginPage() {
       // Redirect to dashboard
       window.location.href = '/';
     } catch (err) {
-      setError('Error de conexiÃ³n. IntÃ©ntalo de nuevo.');
+      setError('Error de conexión. Inténtalo de nuevo.');
       setLoading(false);
     }
   }
@@ -38,14 +38,14 @@ export default function LoginPage() {
   return (
     <>
       <Head>
-        <title>Finera â Iniciar sesiÃ³n</title>
+        <title>Finera — Iniciar sesión</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
       <div style={styles.container}>
         <div style={styles.card}>
           <div style={styles.logoSection}>
             <h1 style={styles.logo}>Finera</h1>
-            <p style={styles.subtitle}>Panel de gestiÃ³n</p>
+            <p style={styles.subtitle}>Panel de gestión</p>
           </div>
 
           <form onSubmit={handleSubmit} style={styles.form}>
@@ -63,12 +63,12 @@ export default function LoginPage() {
             </div>
 
             <div style={styles.field}>
-              <label style={styles.label}>ContraseÃ±a</label>
+              <label style={styles.label}>Contraseña</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Tu contraseÃ±a"
+                placeholder="Tu contraseña"
                 required
                 style={styles.input}
               />
@@ -83,7 +83,7 @@ export default function LoginPage() {
               opacity: loading ? 0.7 : 1,
               cursor: loading ? 'not-allowed' : 'pointer',
             }}>
-              {loading ? 'Iniciando sesiÃ³n...' : 'Iniciar sesiÃ³n'}
+              {loading ? 'Iniciando sesión...' : 'Iniciar sesión'}
             </button>
           </form>
         </div>
