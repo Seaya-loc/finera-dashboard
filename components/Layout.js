@@ -1,13 +1,14 @@
-import { useState } from 'react';
+import { useAuth } from '../pages/_app';
 
 const tabs = [
-  { id: 'economico', label: 'Económico', icon: '📊' },
-  { id: 'comercial', label: 'Comercial', icon: '🤝' },
-  { id: 'operaciones', label: 'Operaciones', icon: '⚙️' },
-  { id: 'producto', label: 'Producto', icon: '🚀' },
+  { id: 'economico', label: 'EconÃ³mico', icon: 'ð' },
+  { id: 'comercial', label: 'Comercial', icon: 'ð¤' },
+  { id: 'operaciones', label: 'Operaciones', icon: 'âï¸' },
+  { id: 'producto', label: 'Producto', icon: 'ð' },
 ];
 
 export default function Layout({ activeTab, onTabChange, children }) {
+  const auth = useAuth();
   return (
     <div style={styles.container}>
       <header style={styles.header}>
@@ -21,21 +22,32 @@ export default function Layout({ activeTab, onTabChange, children }) {
           <span style={styles.logo}>finera</span>
           <span style={styles.logoSub}>Dashboard</span>
         </div>
-        <nav style={styles.nav}>
-          {tabs.map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => onTabChange(tab.id)}
-              style={{
-                ...styles.tab,
-                ...(activeTab === tab.id ? styles.tabActive : {}),
-              }}
-            >
-              <span style={styles.tabIcon}>{tab.icon}</span>
-              {tab.label}
-            </button>
-          ))}
-        </nav>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <nav style={styles.nav}>
+            {tabs.map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => onTabChange(tab.id)}
+                style={{
+                  ...styles.tab,
+                  ...(activeTab === tab.id ? styles.tabActive : {}),
+                }}
+              >
+                <span style={styles.tabIcon}>{tab.icon}</span>
+                {tab.label}
+              </button>
+            ))}
+          </nav>
+          {auth?.user && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, borderLeft: '1px solid #e2e8f0', paddingLeft: 16 }}>
+              <span style={{ fontSize: 13, color: '#718096' }}>{auth.user.name}</span>
+              <button onClick={auth.logout} style={{
+                padding: '4px 10px', border: '1px solid #e2e8f0', background: '#fff',
+                borderRadius: 6, fontSize: 12, color: '#718096', cursor: 'pointer', fontFamily: 'inherit',
+              }}>Salir</button>
+            </div>
+          )}
+        </div>
       </header>
       <main style={styles.main}>
         {children}
